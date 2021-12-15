@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:block;font:8.5em sans-serif;width:960px;height:150px;margin:0 auto" viewBox="0 0 960 150">
+  <style>
+    :root{--c1:#c7589e; --c2:#ed5b6e; --c3:#f9b919; --c4:#26abe2; --c5:#129f4d}
+    <!-- @keyframes stroke-offset{to{stroke-dashoffset:-35%}}.text-copy{fill:none;stroke:#fff;stroke-dasharray:6% 29%;stroke-width:5px;stroke-dashoffset:0%;animation:stroke-offset 5.5s infinite linear}.text-copy:nth-child(1){stroke:#2980b9;animation-delay:-1s}.text-copy:nth-child(2){stroke:#e74c3c;animation-delay:-2s}.text-copy:nth-child(3){stroke:#16a085;animation-delay:-3s}.text-copy:nth-child(4){stroke:#9b59b6;animation-delay:-4s}.text-copy:nth-child(5){stroke:#f39c12;animation-delay:-5s} -->
+    @keyframes stroke-offset{to{stroke-dashoffset:-35%}}.text-copy{fill:none;stroke:#fff;stroke-dasharray:6% 29%;stroke-width:5px;stroke-dashoffset:0%;animation:stroke-offset 5.5s infinite linear}.text-copy:nth-child(1){stroke:var(--c1);animation-delay:-1s}.text-copy:nth-child(2){stroke:var(--c2);animation-delay:-2s}.text-copy:nth-child(3){stroke:var(--c3);animation-delay:-3s}.text-copy:nth-child(4){stroke:var(--c4);animation-delay:-4s}.text-copy:nth-child(5){stroke:var(--c5);animation-delay:-5s}
+  </style>
+  <symbol id="s-text">
+    <text x="50%" y="80%" text-anchor="middle">F r o n t e n d</text>
+  </symbol>
+  <g class="g-ants">
+    <use class="text-copy" href="#s-text"/>
+    <use class="text-copy" href="#s-text"/>
+    <use class="text-copy" href="#s-text"/>
+    <use class="text-copy" href="#s-text"/>
+    <use class="text-copy" href="#s-text"/>
+  </g>
+</svg>
