@@ -1,0 +1,117 @@
+<!--
+  🅰️ Concept
+  - declarative vs imperative ✅
+  - DOM ✅
+
+  🅱️ Steps
+  - Create a h1 element (log, render, event-listener, css)
+  - Create a h1 react element (log, render, event-listener, css)
+
+  🆎 Definitions
+  - Elements: the smallest building blocks of React apps, describes what you want to see on the screen. Unlike browser DOM elements, React elements are plain objects, and are cheap to create.Once you create an element, you can’t change its children or attributes. for new only `ReactDOM.render` is your friend.
+  - React DOM: takes care of updating the DOM to match the React elements.
+-->
+
+<body>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <style>
+    /* h1 { color: red; } */
+    .red {
+      color: red;
+    }
+  </style>
+
+  <div id="root">
+    <!-- <h1>hi</h1> -->
+  </div>
+  <ul id="ul">
+    <li1>1</li1>
+    <li1>2</li1>
+    <li1>3</li1>
+  </ul>
+
+  <script type="text/javascript">
+    // const h1 = document.createElement('h1')
+    // h1.innerText = 'hi2'
+    // h1.setAttribute('class', 'red')
+    // h1.classList.add('red')
+    // h1.className = "red yellow"
+    // console.log(h1)
+    // h1.addEventListener('click', () => {
+    //   console.log('h3 click 1')
+    // })
+    // h1.addEventListener('click', () => {
+    //   console.log('h3 click 2')
+    // })
+    // h1.onclick = () => {
+    //   console.log('h3 click')
+    // }
+    // h1.onclick = () => {
+    //   console.log('h3 click 2')
+    // }
+    // const ul = document.getElementById("ul");
+    // ul.onclick = event => {
+    //   alert(event.target.innerText)
+    // }
+    // const clicker = () => {
+    //   console.log('click shod')
+    // }
+
+    // const h1 = '<h1 class="red" onclick="clicker()">hi3</h1>'
+
+    // const root = document.getElementById('root')
+    // // root.appendChild(h1)
+    // root.innerHTML = h1
+
+    // const ul =
+  </script>
+
+  <script type="text/javascript">
+    // <h1>hi 4</h1>
+    // class
+    /*
+    // prettier-ignore
+    // function boo() { arguments }
+    // const foo = (...args) => { args };
+    */
+
+    function li(children) {
+      return React.createElement(
+        'li',
+        { 'data-all': 'cool' },
+        React.createElement('h1', { 'data-all': 'cool' }, 'hello world'),
+      );
+    }
+
+    const ul = React.createElement(
+      'ul',
+      {
+        // children: li,
+        className: 'red',
+        onClick: event => {
+          console.log(
+            '$$:',
+            event.target.innerText,
+            event.target.dataset.hesam,
+          );
+        },
+      },
+      li(1),
+      li(2),
+      li(3),
+    );
+    // h1.addEventListener('click', () => { console.log('hi react 1') })
+    // h1.onclick = () => { console.log('hi react 1') }
+    // console.log(h1)
+    const root = document.getElementById('root');
+    ReactDOM.render(ul, root);
+
+    // css js html dostan shoma
+    const h1FromDom = document.querySelector('#root > h1');
+
+    // h1FromDom.addEventListener('click', () => {
+    //   console.log(`👉 h3 click 2`)
+    // })
+  </script>
+</body>
