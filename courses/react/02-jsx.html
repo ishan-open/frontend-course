@@ -1,0 +1,203 @@
+<!--
+  🅰️ Concept
+  - JSX
+  - react event
+
+  🅱️ Steps
+  - reproduce lesson one with jsx features
+  - take a look at spread operator
+  - multiple children vs no children
+  - work with inline style
+  - Component & their naming limitation
+  - take a look at props and learn how to override them (order matters)
+
+  🆎 Definitions
+  - components: functions that let you split the UI into independent, reusable pieces, and think about each piece in isolation
+  - props: Arbitrary inputs (properties) of component that are readonly. and help component to be more predictable
+-->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    .big {
+      font-size: 3rem;
+      color: crimson;
+    }
+    .small {
+      font-size: 2rem;
+      color: cornflowerblue;
+    }
+
+    .font-khoshgel {
+      font-family: iranyekan;
+    }
+  </style>
+
+  <script type="text/javascript">
+    // const h1 = React.createElement('h1', null, 'hello')
+    // ReactDOM.render(h1, document.getElementById('root'))
+  </script>
+
+  <script type="text/babel">
+    // const x = 'foo'
+
+    // ast -> [x: 'y']
+    // ast -> print
+
+    // const y = 'foo'
+    // const h1 = '<h1>Hello</h1>'
+
+    // TODO: self closing tags
+    // <img src="src" alt="alt" />
+    // <br />
+    // <hr />
+    // <button></button>
+    // <button />
+
+    // const button = (
+    //   <button
+    //     className="big"
+    //     aria-label="khafan accesibility shodim"
+    //     title="khafan accesibility shodim"
+    //     onClick={() => {
+    //         console.log('clicked')
+    //     }}
+    //   >salam</button>
+    // )
+
+    // const attributes = {
+    //     className: 'big',
+    //     onClick: () => {
+    //       console.log('clicked')
+    //     },
+    //     'aria-label': "khafan accesibility shodim",
+    //     title: "khafan accesibility shodim"
+    // }
+
+    // className={attributes.className}
+    // onClick={attributes.onClick}
+    // createReactElement('button', {...attributes}, 'salam')
+    // createReactElement('button', attributes, 'salam')
+
+    // big -> small ✅
+    // big -> font-samll
+    // { ...attributes,
+    //   className: 'small',
+    // }
+
+    // const attr2 = {...attributes}
+    // attr2.className += ' font-khoshgel'
+
+    // ReactDOM.render(
+    //   <button
+    //   {...attributes}
+    //   className="small"
+    //   >فارسی رو عشقه</button>,
+    //   document.getElementById('root')
+    // )
+    // ReactDOM.render(
+    //   <button {...attr2}>فارسی رو عشقه</button>,
+    //   document.getElementById('root')
+    // )
+
+    // className={`${attributes.className} font-khoshgel`}
+    // _extend({}, attribute, {className: 'font-kh'})
+    // const objectMasoud = {
+    //   ...attributes,
+    //   className: `${attributes.className} font-khoshgel`
+    // }
+    // ReactDOM.render(
+    //   <var
+    //    {...{
+    //       ...attributes,
+    //       className: `${attributes.className} font-khoshgel`,
+    //       children: 'فارسی رو عشقه'
+    //     }
+    //   }
+    //   />, //</button>
+    //   document.getElementById('root')
+    // )
+  </script>
+
+  <script type="text/babel">
+    // function li() {
+    //   return <button
+    //     onClick={() => {
+    //       console.log('clicked')
+    //     }}
+    //       className= {`big font-khoshgel`}
+    //       children='بیا مهاجرت کنیم'
+    //   />
+    // }
+
+    // const add = (a, b) => a+b + Math.random()
+
+    // function Button(props) {
+    //   const {className, onClick, children} = props
+    //   // props.className += ' font-khoshgel'
+    //   // children={children}
+    //   //
+    //   const element = <button
+    //                     onClick={onClick}
+    //                     className= {`big ${className}`}
+    //                     >{children}</button>
+    //   console.log(element)
+    //   return element
+    // }
+
+    /*#__Pure__ React.createElement */
+    //  ReactDOM.render(
+    //   //  li(),
+    //   <Button
+    //     className="font-khoshgel"
+    //     onClick={() => {
+    //       console.log('clicked')
+    //     }}
+    //     // children="اییییییییییییران من"
+    //   >چقدر با مزه</Button>,
+    //   // Button({
+    //   //   className: "font-khoshgel",
+    //   //   onClick: () => {
+    //   //     console.log('clicked')
+    //   //   }}),
+    //   document.getElementById('root')
+    // )
+  </script>
+  <script type="text/babel">
+    function Message({ title, ...reset }) {
+      console.log(reset);
+      return <p>{title}</p>;
+    }
+
+    const H1 = ({ children }) => <h1>{children}</h1>;
+
+    const comps = {
+      p: Message,
+      h1: H1,
+    };
+
+    function App() {
+      const PComponent = comps.p;
+      const HComponent = comps['h1'];
+      // const hComponent = comps['h1']
+      return (
+        <div>
+          <PComponent title="first" />
+          <PComponent title="second">salam</PComponent>
+          <HComponent>va dorod</HComponent>
+          {/* <div>inja</div> */}
+          <comps.p title="second" />
+          <comps.h1>From second</comps.h1>
+          {/* <comps['h1']>from h1</comps['h1']> */}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
