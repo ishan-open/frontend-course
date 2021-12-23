@@ -1,0 +1,40 @@
+<!--
+  🅰️ Concept
+  - Conditional rendering
+  - Prop Validation
+
+  🅱️ Steps
+  - reproduce lesson one with jsx features
+  - take a look at spread operator
+  - multiple children vs no children
+  - work with inline style
+  - Component & their naming limitation
+  - take a look at props and learn how to override them (order matters)
+
+  🆎 Definitions
+  - components: functions that let you split the UI into independent, reusable pieces, and think about each piece in isolation
+  - props: Arbitrary inputs (properties) of component that are readonly. and help component to be more predictable
+-->
+<!-- typeSpecs, values, location, componentName, getStack -->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+  <script type="text/babel">
+    function Add5({ number, onClick }) {
+      const plus5 = number + 5;
+      return <button onClick={onClick}>{plus5}</button>;
+    }
+
+    Add5.propTypes = {
+      number: PropTypes.number,
+      onClick: PropTypes.func,
+    };
+
+    ReactDOM.render(<Add5 number={+'5'} />, document.getElementById('root'));
+  </script>
+</body>
