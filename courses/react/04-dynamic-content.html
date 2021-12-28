@@ -1,0 +1,221 @@
+<!--
+- zero children ✅
+- component and props ✅
+Session 3️⃣
+- Typechecking `prop-types` in depth
+
+- Multi children `fragment`
+- Conditional rendering `&& ?`
+- Iterating over a list of elements
+- Keys in a list -> define list before the class with images
+- JSX vs js expression
+-->
+
+<!-- TODO: R&D -->
+<!-- XSS DOM -->
+<!-- const src = window.prompt() -->
+<!-- src = "'' onerror='window.alert('hack shodi')'" -->
+<!-- body.appendChild(`<img src={src} />`) -->
+<!-- <img src={src} /> -->
+<!-- <img src="'' onerror='window.alert('hack shodi')'" alt=""> -->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+
+  <!-- <script type="text/babel">
+    function Anghozi({ isGhermezi }) {
+      return <div>Dore kolash {isGhermezi ? '🎩' : '🙋'}</div>;
+    }
+
+    // function App({comp: Component = Anghozi, ...rest}) {
+    function App(props) {
+      // const Component = props.comp;
+      return (
+        <pre
+          className={
+            // !prop.className ? '' :
+            props.className &&
+            Object.keys(props.className)
+              .filter(key => props.className[key])
+              .join(' ')
+          }
+        >
+          {<props.comp isGhermezi={true} />}
+          {/* props.comp */}
+          <code>{JSON.stringify(props, null, 2)}</code>
+        </pre>
+      );
+    }
+    // what we want
+    // className:  { 'red': true, 'big': false, 'code': true }
+    App.propTypes = {
+      optionalArray: PropTypes.array,
+      // className: PropTypes.objectOf(PropTypes.bool),
+      // exact vs shape
+      // className: PropTypes.shape({
+      className: PropTypes.exact({
+        // TODO:
+        // red: true,
+        red: PropTypes.bool,
+        big: PropTypes.bool,
+        code: PropTypes.bool.isRequired,
+      }).isRequired,
+
+      onClick: PropTypes.func.isRequired,
+      // comp: PropTypes.node,
+      // comp: PropTypes.element,
+      comp: PropTypes.elementType,
+
+      tuple: function (props, propName, componentName) {
+        const value = props[propName]; // TODO: why not props.tuple
+        if (
+          !Array.isArray(value) ||
+          value.length !== 2 ||
+          typeof value[0] !== 'number' ||
+          typeof value[1] !== 'string'
+        )
+          return new Error(
+            `Invalid prop \`${propName}\` supplied to \`${componentName}\`.`,
+          );
+      },
+    };
+
+    // Array.isArray()
+    // Number.isNaN()
+
+    ReactDOM.render(
+      <App
+        optionalArray={[1, 'two', { z: 0 }]}
+        onClick={() => console.log('click')}
+        tuple={[]}
+        className={{
+          red: true,
+          big: false,
+          code: true,
+          /* amirhe: 'yeah', ...onObject */
+        }}
+        // comp="iframe"
+        comp={Anghozi}
+        // comp={Anghozi({ isGhermezi: true })}
+        // comp={<Anghozi isGhermezi={true} />}
+      />,
+      // TODO: task why two comp are different
+      document.getElementById('root'),
+    );
+  </script> -->
+  <script type="text/babel">
+    let x = 0;
+    function App(props) {
+      // TODO:
+      // const method = () => 'method';
+      // {delete this['method']}
+      const fragment = true;
+
+      return (
+        <div>
+          {'salam'}
+          {5}
+          {/* () => 8 */}
+          {(() => 8)()}
+          {/* [() => 8] */}
+          {(x = 5) /* TODO: this is expression and what? */}
+          {true}
+          {false}
+          {null}
+          {x ? 'x hast' : 'x nist'}
+          {void (5 + 6)}
+          {/* if (x > 5) return false */}
+          {[].forEach(s => console.log(s))}
+          {88 && 77}
+          {88 & 77}
+          {88 | 77}
+          {<p>Salam</p>}
+          {['slam', 'va', 'dorod'].join('*')}
+          <br />
+          <br />
+          {['slam', 'va', 'dorod']}
+          <hr />
+          {[<p>Salam</p>, <p>va dorod</p>]}
+          {
+            <React.Fragment>
+              <p>Salam</p>
+              <p>va dorod</p>
+            </React.Fragment>
+          }
+          fragment && (
+          {Boolean(fragment) && (
+            <React.Fragment>
+              <p>last</p>
+            </React.Fragment>
+          )}
+        </div>
+      );
+    }
+
+    function Frg() {
+      return (
+        // <div>
+        // <React.Fragment>
+        <>
+          <div>instagram</div>
+          <img src="/" />
+        </>
+        // </React.Fragment>
+        // </div>
+      );
+    }
+
+    // TODO: R&D Fragment
+
+    // const returnMe = () => (x = 5);
+    // const returnMe = () => if (x > 5) return false;
+    // const returnMe = () => switch (x ) {};
+    // const returnMe = () => for;
+    // const returnMe = () => while;
+    // const returnMe = () => [].forEach(s => console.log(s));
+    const returnMe = () => 88 && 77;
+
+    console.log(() => 5);
+
+    const list = [1, 2, 1, 4, 5];
+    const list2 = [
+      { id: 'one', value: 1 },
+      { id: 'one-2', value: 1 },
+    ];
+
+    const doros = ['arabi', 'shimi', 'shimi2']
+
+      // prettier
+      .reverse()
+      // .map((i, index) => <li key={i}>{i}</li>);
+      // .map((i, index) => <li key={index}>{i}</li>);
+      .map((i, index) => <li key={i + index}>{i}</li>);
+    // .map((i, index) => <li key={i.id}>{i}</li>);
+
+    console.log(`👉 list`, list);
+
+    function Ul() {
+      return (
+        <ul>
+          {list}
+          <li>1</li>
+        </ul>
+      );
+    }
+
+    function AndAnd({ component: Component, test }) {
+      if (test) return <Component />;
+      return <div>test failed</div>;
+
+      // Fallback can also be passed like a
+      return test ? <Component /> : <div>test failed</div>;
+    }
+
+    ReactDOM.render(<Ul />, document.getElementById('root'));
+  </script>
+</body>
