@@ -1,0 +1,297 @@
+<!--
+🅰️ Concept
+  - State (vs Freezed props)
+  prop.array[3] = 'ye chize dige'
+  - Hooks
+    - Only at the top level (Don’t call Hooks inside loops, conditions, or nested functions.)
+    - Only in Component (functional) not normal (🙅‍♀️) JS function
+  - Array naming convention `[state, setState]`
+  - `Thinking in React` (`Uni directional flow`)
+
+🅱️ Steps
+  - Use state
+    - <Counter />
+      - increment (with setState, and without it)
+    - Input submission
+  - useEffect
+  - useRef
+  - Install and use React DevTools
+
+  🆎 Definitions
+  - Hook: is a special function that lets you “hook into” React features (life cycles)
+  - Virtual DOM: The virtual DOM (VDOM) is a programming concept where an ideal, or “virtual”, representation of a UI is kept in memory and synced with the “real” DOM by a library such as ReactDOM. This process is called reconciliation.
+-->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+
+  <script type="text/babel">
+    const liGenerator = (value, index) => <li key={value}>index: ${index}</li>;
+    // const liGeneratorFancy = (value, index) => (
+    //   <li key={value} style={{ color: 'tomato' }}>
+    //     index: ${index}
+    //   </li>
+    // );
+    // react convention is to name this specific type of props as `render`
+    function RenderProps({ listItemGenerator }) {
+      const ids = ['id-1', 'id-2', 'id-3', 'id-4'];
+      return (
+        <ul>
+          {listItemGenerator('first-key', 'First-Index')}
+          {ids.map((value, index, _array) =>
+            listItemGenerator(value, '🌹' + index),
+          )}
+        </ul>
+      );
+      // return <ul>{ids.map(listItemGenerator)}</ul>;
+    }
+
+    function StateChangerWithInternalMechanism() {
+      let state = 'salam';
+      console.log(state);
+      setTimeout(() => {
+        console.log(state);
+      }, 3000);
+      return (
+        <button
+          onClick={() => {
+            console.log('before', state);
+            state = state === 'salam' ? 'khodafezh' : 'salam';
+            console.log('after', state);
+          }}
+        >
+          {state} 🧕
+        </button>
+      );
+    }
+
+    let outerState = 'salam';
+    function StateChangerWithExternalMechanism() {
+      console.log(outerState);
+      setTimeout(() => {
+        console.log(outerState);
+      }, 3000);
+      return (
+        <button
+          onClick={e => {
+            console.log('before', outerState);
+            outerState = outerState === 'salam' ? 'khodafezh' : 'salam';
+            e.target.innerText = `${outerState} 😂`;
+            console.log('after', outerState);
+          }}
+        >
+          {outerState} 😂
+        </button>
+      );
+    }
+
+    function StateChangerWithReactHooks() {
+      // const stateArray = React.useState('salam'); // initial value
+      // let state = stateArray[0];
+      // const setState = stateArray[1];
+      const [state, setState] = React.useState('salam');
+      // console.count('StateChangerWithReactHooks.render');
+      console.log('🌏', state);
+      return (
+        <button
+          onClick={() => {
+            // state = 'khodafezh'; // doesn't work
+            // setState('khodafezh');
+            setState(state === 'salam' ? 'khodafezh' : 'salam');
+            // setState(state === 'salam' ? 'khodafezh' : 'salam');
+            console.log(state);
+            // NOTE: side effect, batch
+          }}
+        >
+          {state} 🌩️
+        </button>
+      );
+    }
+    // function Counter({ hasState = true, show }) {
+    function Counter() {
+      const [count, setCount] = React.useState(0);
+      // we can do this, but do not try this at Home
+      // let count;
+      // let setCount;
+      // if (hasState) {
+      //   [count, setCount] = React.useState(0);
+      // }
+      // if (!show) return null; // TODO: optimization
+
+      // count = 1
+      return (
+        <button
+          onDoubleClick={() => {
+            // count++; // doesn't work
+            // count = count + 1; // doesn't work
+            // setCount(count + 2);
+            setCount(count + 1); // set  0 + 1
+            // setCount(count + 1); // set  0 + 1
+            // setCount('bro baba');
+            setCount(function setCounter(latestCount) {
+              return latestCount + 1;
+            });
+            // NOTE: side effect + async (timer)
+          }}
+          onClick={() => {
+            // setCount(count + 1);
+            // setCount(0 + 1);
+            // setCount(1 + 1);
+          }}
+        >
+          clicked:{count}
+          {/*
+          // clicked:{0}
+          // clicked:{1}
+         */}
+        </button>
+      );
+    }
+    function InputValueChanger() {
+      const [todos, setTodos] = React.useState(['todo-1', 'todo-2']);
+      const [text, setText] = React.useState('');
+      // return null;
+
+      // TODO: shuffle a list with setState and set keys to one of following (uid, index, random things every time)
+      // [...list.sort(() => Math.random() - 0.5)]
+
+      return (
+        <>
+          <input
+            type="text"
+            placeholder="enter todo"
+            onChange={e => setText(e.target.value)}
+          />
+          <br />
+          <button
+            onClick={() => {
+              // for performance tips it ignores updates
+              // todos.push(text);
+              // setTodos(todos);
+
+              setTodos([...todos, text]);
+            }}
+          >
+            submit todo.text="{text}"
+          </button>
+          <ul>
+            {todos.map(todo => (
+              <li key={todo}>{todo}</li>
+            ))}
+          </ul>
+        </>
+      );
+    }
+
+    // let oldData;
+    function FetchMechanism() {
+      const [data, setData] = React.useState({});
+
+      if (!data.title) {
+        fetch('https://jsonplaceholder.typicode.com/todos/1')
+          .then(response => response.json())
+          .then(json => {
+            setData(json);
+            // oldData = data;
+          });
+      }
+
+      // on data change event: change document.title
+      // if (oldData !== data) {}
+
+      return (
+        <pre>
+          <code>{JSON.stringify(data)}</code>
+        </pre>
+      );
+    }
+    function MountLifeCycle() {
+      const [data, setData] = React.useState({});
+
+      // React.useEffect(effect, dependencyArray);
+      React.useEffect(() => {
+        fetch('https://jsonplaceholder.typicode.com/todos/1')
+          .then(response => response.json())
+          .then(json => setData(json));
+      }); // for every time update with any state change
+      // }, [data]); // updates whenever the data changes (every time)
+      // }, [data.title]); // only update when data.title changes (first time, and second time)
+      // }, []); // for no update with any data change
+
+      return (
+        <pre>
+          <code>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      );
+    }
+
+    function UnMountLifeCycle() {
+      return null;
+    }
+    function UpdatingEffects() {
+      return null;
+    }
+
+    function ChildWithState() {
+      return null;
+    }
+    function ParentWithState() {
+      return <ChildWithState />;
+    }
+
+    function IncrementorForProps({ component }) {
+      return null;
+    }
+    function IncrementorForChildren({ children }) {
+      return null;
+    }
+    function IncrementorForRenderProps({ component }) {
+      return null;
+    }
+    function CustomStateHook() {
+      return null;
+    }
+    function ElementReference() {
+      return null;
+    }
+
+    function Root() {
+      return [
+        // children: render props
+        // <RenderProps listItemGenerator={liGenerator} />,
+        // <RenderProps listItemGenerator={liGeneratorFancy} />,
+        // <RenderProps
+        //   listItemGenerator={(value, index) => (
+        //     <div key={value}>
+        //       <kbd>${index}</kbd>
+        //     </div>
+        //   )}
+        // />,
+        // what is state
+        // <StateChangerWithInternalMechanism key="StateChangerWithInternalMechanism" />,
+        // <StateChangerWithExternalMechanism key="StateChangerWithExternalMechanism" />,
+        // <StateChangerWithReactHooks key="StateChangerWithReactHooks" />,
+        // <Counter key="Counter" />,
+        // <InputValueChanger key="InputValueChanger" />,
+        // https://github.com/public-apis/public-apis
+        // <FetchMechanism key="FetchMechanism" />,
+        <MountLifeCycle key="MountLifeCycle" />,
+        <UnMountLifeCycle key="UnMountLifeCycle" />,
+        <UpdatingEffects key="UpdatingEffects" />,
+        <ChildWithState key="ChildWithState" />,
+        <ParentWithState key="ParentWithState" />,
+        <IncrementorForProps key="IncrementorForProps" />,
+        <IncrementorForChildren key="IncrementorForChildren" />,
+        <IncrementorForRenderProps key="IncrementorForRenderProps" />,
+        <CustomStateHook key="CustomStateHook" />,
+        <ElementReference key="ElementReference" />,
+      ];
+    }
+
+    ReactDOM.render(<Root />, document.getElementById('root'));
+  </script>
+</body>
