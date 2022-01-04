@@ -1,0 +1,79 @@
+<!-- SOMETHING -->
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    function myHook() {
+      const [first, firstSet] = React.useState(1);
+      let second, secondSet;
+      if (first !== 2) {
+        // ===
+        // Previous render            Next render
+        //  ------------------------------------------------------
+        // 1. useState                   useState
+        // 2. undefined                  useState
+        //  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        // react-dom.development.js:15080 Uncaught Error: Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+        [second, secondSet] = React.useState(2);
+      }
+      let third, thirdSet;
+      if (first === 2) {
+        [third, thirdSet] = React.useState(3);
+      }
+
+      return { first, second, third, firstSet, secondSet, thirdSet };
+    }
+
+    function App() {
+      const { firstSet, secondSet, thirdSet, ...state } = myHook();
+
+      return (
+        <div>
+          <button onClick={() => firstSet(f => f + 1)}>inc first</button>
+          <button onClick={() => secondSet(f => f + 1)}>inc second</button>
+          <button onClick={() => thirdSet(f => f + 1)}>inc third</button>
+          <pre>
+            <code>{JSON.stringify(state, null, 2)}</code>
+          </pre>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+
+  <script type="text/babel">
+    const log = console.log.bind(console);
+    function App() {
+      const [obj, objSet] = React.useState({});
+
+      React.useEffect(() => log('useEffect []'), []);
+      React.useEffect(() => log(`useEffect [${JSON.stringify(obj)}]`), [obj]);
+      React.useEffect(() => log('useEffect'));
+
+      return (
+        <div>
+          <button onClick={() => objSet({})}>set new obj</button>
+          <button onClick={() => objSet(obj)}>set same obj</button>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+
+  <script type="text/babel">
+    function App() {
+      // reducer: R,
+      // initializerArg: I,
+      // initializer: (arg: I) => ReducerStateWithoutAction<R>
+      const reducer = (state = initialState, action) => state;
+      useReducer(reducer, undefined, reducer);
+      const init = initialState => ({ count: initialState });
+      useReducer(reducer, initialState, init);
+      return null;
+    }
+  </script>
+</body>

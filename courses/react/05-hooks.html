@@ -209,15 +209,26 @@
         </pre>
       );
     }
-    function MountLifeCycle() {
+
+    function MountLifeCycleFetch() {
       const [data, setData] = React.useState({});
 
       // React.useEffect(effect, dependencyArray);
       React.useEffect(() => {
-        fetch('https://jsonplaceholder.typicode.com/todos/1')
+        // https://stackoverflow.com/questions/31061838/how-do-i-cancel-an-http-fetch-request
+        const controller = new AbortController();
+        const signal = controller.signal;
+        fetch('https://jsonplaceholder.typicode.com/todos/1', {
+          signal: signal,
+        })
           .then(response => response.json())
           .then(json => setData(json));
-      }); // for every time update with any state change
+
+        return () => {
+          // cleanup
+          controller.abort();
+        };
+      }, []); // for every time update with any state change
       // }, [data]); // updates whenever the data changes (every time)
       // }, [data.title]); // only update when data.title changes (first time, and second time)
       // }, []); // for no update with any data change
@@ -229,11 +240,168 @@
       );
     }
 
-    function UnMountLifeCycle() {
-      return null;
+    // TODO: 2 useEffect
+    const logger = message => {
+      console.log('🌟');
+      return () => console.log(message);
+    };
+
+    function howUseEffectWillAbstractlyWork(fn, condition) {
+      if (!condition) return null;
+      fn();
     }
+    function MountLifeCycle() {
+      const [counter, setCounter] = React.useState(0);
+
+      // React.useEffect(effect, dependencyArray);
+      React.useEffect(logger('Mounted'), []);
+      // React.useEffect(() => console.log('Mounted'), []);
+      console.log('render, <MountLifeCycle />');
+
+      return (
+        <div>
+          Mounted:{' '}
+          <button onClick={() => setCounter(counter + 1)}>{counter}</button>
+        </div>
+      );
+    }
+    function UnMountLifeCycle() {
+      const [counter, setCounter] = React.useState(0);
+
+      // React.useEffect(effect, dependencyArray);
+      React.useEffect(() => {
+        // console.log('Mounted');
+        return () => console.log('UnMounted'); // you are dead
+      }, []);
+
+      console.log('render, <UnMountLifeCycle />');
+      return (
+        <div>
+          Unmounte:{' '}
+          <button onClick={() => setCounter(counter + 1)}>{counter}</button>
+        </div>
+      );
+    }
+    function MountUnMountLifeCycle() {
+      const [counter, setCounter] = React.useState(0);
+
+      // React.useEffect(effect, dependencyArray);
+      React.useEffect(() => {
+        console.log('Mounted');
+        return () => console.log('UnMounted'); // you are dead
+      }, []);
+
+      React.useEffect(() => {
+        // add event listener
+        const listener = () => console.log('I am listener');
+        const button = document.getElementById('btn');
+        button.addEventListener('click', listener);
+        return () => {
+          button.removeEventListener('click', listener);
+        };
+      }, []);
+
+      // for many useEffects
+      React.useEffect(() => {
+        console.log('Mounted 2');
+        return () => console.log('UnMounted 2'); // you are dead
+      }, []);
+
+      console.log('render, <MountUnMountLifeCycle />');
+      return (
+        <div>
+          MountUnMount:
+          <button id="btn" onClick={() => setCounter(counter + 1)}>
+            {counter}
+          </button>
+        </div>
+      );
+    }
+    function ConditionalRenderingUnMountLifeCycle() {
+      const [show, setToggleShow] = React.useState(true);
+
+      return (
+        <div>
+          <button onClick={() => setToggleShow(!show)}>
+            toggle {show ? 'MountLifeCycle' : 'UnMountLifeCycle'}
+          </button>
+          {/*show ? <MountLifeCycle /> : <UnMountLifeCycle />*/}
+          {show && <MountUnMountLifeCycle />}
+        </div>
+      );
+    }
+
+    function UseStateInDepth() {
+      // heavy computation
+      // const [fn, setFn] = React.useState(Array.from({ length: 10000 }, () => '🌟'))
+      // const [fn, setFn] = React.useState(() => {
+      //   return Array.from({ length: 10000 }, () => '🌟');
+      // });
+
+      const [fn, setFn] = React.useState(() => () => console.log('🌟'));
+
+      return (
+        <div>
+          <button onClick={() => fn()}>OnClick</button>
+          <button
+            onClick={() =>
+              setFn(lastedFn => {
+                // console.log('🌜', lastedFn);
+                return () => console.log('🌜');
+              })
+            }
+          >
+            Change function
+          </button>
+        </div>
+      );
+    }
+
     function UpdatingEffects() {
-      return null;
+      const [counter, setCounter] = React.useState(0);
+
+      /**
+       * how to run effect
+       * let clear = effect()
+       * if (clear) clear()
+       * clear = effect()
+       */
+      // React.useEffect(() => {
+      //   console.log('Update'); // maybe it is also mounted phase
+      //   return () => console.log('Clear');
+      // }, [counter]);
+      // counter=0 => dep=[0]
+      // counter=1 => dep=[1]
+      // 0===1
+
+      // counter=0 => dep=[0]
+      // counter=5 => dep=[5]
+      // 0===5
+      // counter=5 => dep=[5]
+      // 5 === 5
+
+      React.useEffect(() => {
+        console.log('Update', counter); // maybe it is also mounted phase
+        return () => console.log('Clear', counter);
+      }, [counter]);
+
+      // React.useEffect(() => {
+      //   console.log('Update', 0); // maybe it is also mounted phase
+      //   return () => console.log('Clear', 0);
+      // }, [0]);
+      // React.useEffect(() => {
+      //   console.log('Update', 1); // maybe it is also mounted phase
+      //   return () => console.log('Clear', 1);
+      // }, [1]);
+
+      console.log('render, <UpdatingEffects />');
+      return (
+        <div>
+          UpdatingEffects:
+          <button onClick={() => setCounter(counter + 1)}>{counter}</button>
+          <button onClick={() => setCounter(5)}>set counter 5</button>
+        </div>
+      );
     }
 
     function ChildWithState() {
@@ -252,11 +420,63 @@
     function IncrementorForRenderProps({ component }) {
       return null;
     }
-    function CustomStateHook() {
-      return null;
+
+    // swr()
+    function useMyCustomDataFetcherHook(todoIndex) {
+      // use all  other hooks
+      const [data, setData] = React.useState({});
+      const [isLoading, setIsLoading] = React.useState(false);
+      const [error, setError] = React.useState(null);
+
+      React.useEffect(() => {
+        setIsLoading(true);
+        // https://stackoverflow.com/questions/31061838/how-do-i-cancel-an-http-fetch-request
+        fetch(`https://jsonplaceholder.typicode.com/todos/${todoIndex}`)
+          .then(response => response.json())
+          .then(json => setData(json))
+          .catch(e => setError(e.message))
+          .finally(() => setIsLoading(false));
+      }, [todoIndex]);
+
+      // return
+      return {
+        data,
+        error,
+        isLoading,
+      };
     }
+
+    function CustomStateHook() {
+      const [todoIndex, setTodoIndex] = React.useState(1);
+      const { data, error, isLoading } = useMyCustomDataFetcherHook(todoIndex);
+      if (isLoading) return <div>Loading...</div>;
+      if (error) return <div>{error}</div>;
+
+      return (
+        <pre>
+          <code>{JSON.stringify(data, null, 2)}</code>
+          <button onClick={() => setTodoIndex(todoIndex + 1)}>
+            get next todo
+          </button>
+        </pre>
+      );
+    }
+
     function ElementReference() {
-      return null;
+      const myRef = React.useRef(null);
+      // console.log(myRef);
+      // myRef.current = '56';
+      // console.log(myRef);
+      // useMemo
+      // useImperativeHandle
+      React.useEffect(() => {
+        console.log('in effect', myRef);
+        myRef.current.select();
+        // SDK(element)
+        // SDK(myRef.current);
+      }, []);
+
+      return <input type="text" ref={myRef} defaultValue="salam" />;
     }
 
     function Root() {
@@ -279,15 +499,17 @@
         // <InputValueChanger key="InputValueChanger" />,
         // https://github.com/public-apis/public-apis
         // <FetchMechanism key="FetchMechanism" />,
-        <MountLifeCycle key="MountLifeCycle" />,
-        <UnMountLifeCycle key="UnMountLifeCycle" />,
-        <UpdatingEffects key="UpdatingEffects" />,
+        // <MountLifeCycle key="MountLifeCycle" />,
+        // <ConditionalRenderingUnMountLifeCycle key="UnMountLifeCycleToggle" />,
+        // <UnMountLifeCycle key="UnMountLifeCycle" />,
+        // <UseStateInDepth key="UseStateInDepth" />,
+        // <UpdatingEffects key="UpdatingEffects" />,
         <ChildWithState key="ChildWithState" />,
         <ParentWithState key="ParentWithState" />,
         <IncrementorForProps key="IncrementorForProps" />,
         <IncrementorForChildren key="IncrementorForChildren" />,
         <IncrementorForRenderProps key="IncrementorForRenderProps" />,
-        <CustomStateHook key="CustomStateHook" />,
+        // <CustomStateHook key="CustomStateHook" />,
         <ElementReference key="ElementReference" />,
       ];
     }
