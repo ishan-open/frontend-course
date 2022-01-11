@@ -1,0 +1,212 @@
+<!--
+🅰️ Concept
+🅱️ Steps
+  - Install and use React DevTools
+  [think in react]
+    - Is it passed in from a parent via props? If so, it probably isn’t state.
+    - Does it remain unchanged over time? If so, it probably isn’t state.
+    - Can you compute it based on any other state or props in your component? If so, it isn’t state.
+  - useReducer
+
+  🆎 Definitions
+  - Virtual DOM: The virtual DOM (VDOM) is a programming concept where an ideal, or “virtual”, representation of a UI is kept in memory and synced with the “real” DOM by a library such as ReactDOM. This process is called reconciliation.
+-->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+
+  <style>
+    code {
+      font-family: 'Cascadia Code, Fira Code';
+    }
+    button {
+      width: 100px;
+      background: #27ae60;
+      font-weight: bold;
+      color: white;
+      border: 0 none;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 10px 5px;
+      margin: 10px 5px;
+    }
+  </style>
+
+  <!-- why set state is async operation -->
+  <script type="text/babel">
+    function Child({ count, setCount, onClick }) {
+      console.count('child');
+      return (
+        <button
+          children={count}
+          onClick={() => (setCount('child'), onClick())}
+        />
+      );
+    }
+    function WhySetStateIsNotSync() {
+      const [count, setCount] = React.useState(0);
+      const onClick = () => setCount('parent');
+      return <Child count={count} setCount={setCount} onClick={onClick} />;
+    }
+  </script>
+
+  <!-- useReducer -->
+  <script type="text/babel">
+    const CodeBlock = ({ json }) => (
+      <pre children={<code children={JSON.stringify(json, null, 2)} />} />
+    );
+
+    const Button = ({ onClick, action }) => (
+      <button onClick={onClick} children={action} />
+    );
+
+    // const OptimizedButton = ({ dispatch, value, action: type }) => (
+    //   <button
+    //     onClick={() => {
+    //       dispatch({ type, value });
+    //     }}
+    //     children={action}
+    //   />
+    // );
+
+    const BigStateWithUseState = () => {
+      const [state, setState] = React.useState({
+        count: 0,
+        name: '',
+        isLoading: false,
+      });
+
+      // setState(st => st)
+      const oldState = oldState || React.useRef(state);
+      console.log('are these equal =', oldState.current === state);
+      oldState.current = state;
+
+      // const onClickIncrement = () =>
+      //   setState(st => ({ ...st, count: st.count + 1 }));
+
+      return (
+        <div>
+          <Button
+            action="increment+1"
+            onClick={() => setState({ ...state, count: state.count + 1 })}
+          />
+          <Button
+            action="changeNameToSomethingRandom"
+            onClick={() =>
+              setState({ ...state, name: Math.random().toString(36).slice(2) })
+            }
+          />
+          <CodeBlock json={state} />
+        </div>
+      );
+    };
+
+    // https://reactjs.org/docs/hooks-reference.html#usereducer
+
+    // reducer: (state, action) => newState
+    // next state
+    function reducer(state, action) {
+      switch (action) {
+        case 'increment+1':
+          return { ...state, count: state.count + 1 };
+        case 'changeNameToSomethingRandom':
+          return { ...state, name: Math.random().toString(36).slice(2) };
+        default:
+          throw new Error('balad nisti react nazan, action ro check kon!');
+      }
+    }
+
+    // const initialState = { count: 0, name: '', isLoading: false };
+    // let newState = reducer(initialState, 'increment+1');
+    // console.log(reducer(newState, 'increment+1'));
+
+    // onClick={() => setState(reducer(state, 'increment+1'))}
+    // onClick={() => setState(reducer(state, 'changeNameToSomethingRandom'))}
+    // const [state, _] = React.useReducer((state, action) => state, initialState);
+
+    const initialArg = {
+      fired: false,
+      name: 'reiner',
+      gpa: 19.5,
+    };
+
+    // const [fired, setFired] = React.useState(false);
+    // dastorolAmal = {type: string<namayaned dastorolAmal ghabli>, value: any}
+    // const state = {value: {}} // TODO: hesam
+    function modir(user, dastorolAmal) {
+      if (dastorolAmal.type === 'fired') return { ...user, fired: !user.fired };
+      if (dastorolAmal.type === 'changeName')
+        return { ...user, name: dastorolAmal.value };
+      if (dastorolAmal.type === 'changeGPA') {
+        user.gpa = dastorolAmal.value - 0.5;
+        return user;
+      }
+      // else throw new Error('balad nisti react nazan, action ro check kon!');
+      return user;
+    }
+
+    // const [state, dispatch] = React.useReducer(reducer, undefined, reducer)
+    const BigStateWithUseReducer = ({
+      nameDaneshAmoz = 'levi',
+      vazeiateDaneshAmozi = true,
+      moadel = 22,
+    }) => {
+      const [state, dispatch] = React.useReducer(
+        modir,
+        {
+          nameDaneshAmoz,
+          vazeiateDaneshAmozi,
+          moadel,
+        },
+        initialArgFromPropsThatWeMaid => ({
+          fired: initialArgFromPropsThatWeMaid.vazeiateDaneshAmozi,
+          name: initialArgFromPropsThatWeMaid.nameDaneshAmoz,
+          gpa: initialArgFromPropsThatWeMaid.moadel,
+        }),
+      );
+
+      return (
+        <div>
+          <Button
+            action="fired"
+            onClick={() => {
+              dispatch({ type: 'fired' });
+            }}
+          />
+
+          <Button
+            action="changeName"
+            onClick={() => {
+              dispatch({ type: 'changeName', value: 'mikasa' });
+            }}
+          />
+
+          <Button
+            action="changeGPA"
+            onClick={() => {
+              dispatch({ type: 'changeGPA', value: 17 });
+            }}
+          />
+
+          <CodeBlock json={state} />
+        </div>
+      );
+    };
+  </script>
+
+  <script type="text/babel">
+    function Root() {
+      return [
+        // <WhySetStateIsNotSync key="WhySetStateIsNotSync" />,
+        // <BigStateWithUseState key="BigStateWithUseState" />,
+        <BigStateWithUseReducer key="BigStateWithUseReducer" />,
+      ];
+    }
+
+    ReactDOM.render(<Root />, document.getElementById('root'));
+  </script>
+</body>
