@@ -149,6 +149,7 @@
       return user;
     }
 
+    // const [state, dispatch] = React.useReducer(reducer, initialArg, init)
     // const [state, dispatch] = React.useReducer(reducer, undefined, reducer)
     const BigStateWithUseReducer = ({
       nameDaneshAmoz = 'levi',
@@ -196,6 +197,11 @@
         </div>
       );
     };
+    // names: ['foo', 'bar', 'baz'];
+    // 3 lines of code
+    // function getName
+    // const init = initialArg => firstState
+    // const [_, forceRender] = React.useReducer(s => s + 1, 0);
   </script>
 
   <script type="text/babel">
