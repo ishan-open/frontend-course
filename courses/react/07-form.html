@@ -1,0 +1,219 @@
+<!--
+[Forms]
+- work a bit differently because form elements naturally keep some internal state
+- controlled components
+-> React component that renders a form also controls what happens in that form on subsequent user input.
+-> With a controlled component, the input’s value is always driven by the React state.
+-> can pass the value to other UI elements too reset it from other event handlers.
+-> use value instead of selected in controlled component
+<option value="1" selected>Option 1</option>
+- <input type="text">, <textarea>, and <select> all work very similarly - they all accept a value attribute that you can use to implement a controlled component.
+  <input type="checkbox" /> -> e.target.checked
+  name -> e.target.name
+- passing value means that is is not editable by user -> change to undefined or null for reset
+-> 🧘 handled by the React
+- uncontrolled components
+-> stores its own state internally, and you query the DOM using a ref to find its current value when you need it.
+-> its value is read-only, it is an uncontrolled component in React.
+-> 🧘 handled by the DOM
+
+- alternative [Formik (https://formik.org/)]
+- validation: Yup  (https://github.com/jquense/yup)
+- validation: Joi  (https://github.com/sideway/joi)
+-->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    /* prettier-ignore */
+    form {display: flex; flex-direction: column;}
+    /* prettier-ignore */
+    body * {margin: 5px}
+
+    input[type='checkbox']:focus {
+      box-shadow: 3px 0 0 5px red;
+      font-size: 16px;
+    }
+  </style>
+
+  <script type="text/babel">
+    // input{...other}, textarea, select
+    // label {htmlFor, warped}
+    // onChange
+    // onBlur
+    // e.target.value & e.target.checked
+    // event.target.dataset.something
+    // event.target.getAttribute('data-something')
+    // event.target.querySelector('option[value="1"]').selected
+    // input checked
+    // onSubmit
+    // event.preventDefault()
+    // all in one handler for multiple inputs
+    const P = props => console.count('render') || <p {...props} />;
+    function FormSubmissionBasicOld() {
+      const [text, setText] = React.useState(false);
+      return (
+        <form>
+          <label htmlFor="name">click me to check</label>
+          <input
+            id="name"
+            type="checkbox"
+            checked={!!text}
+            onChange={e => setText(!e.target.checked)}
+            placeholder="placeholder"
+          />
+
+          <label>
+            click me to focus textarea
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value)}
+              placeholder="placeholder"
+            />
+          </label>
+          <P children={text} />
+        </form>
+      );
+    }
+
+    function FormSubmissionBasic() {
+      const [text, setText] = React.useState(false);
+
+      const onSubmit = e => {
+        console.log(e);
+        e.preventDefault();
+        const form = e.target;
+        console.log('sendAPI()', {
+          text,
+          university: form.university.checked,
+        });
+
+        // const formData = new FormData(e.target);
+        // console.log('formData', formData.getAll());
+      };
+      return (
+        <form onSubmit={onSubmit}>
+          <label htmlFor="university">click me to check</label>
+          <input
+            id="university"
+            name="university"
+            type="checkbox"
+            placeholder="placeholder"
+          />
+
+          <label>
+            click me to focus textarea
+            <textarea
+              name="text"
+              onChange={console.log}
+              placeholder="placeholder"
+            />
+          </label>
+
+          <select>
+            {/* prettier-ignore*/}
+            <option value="" disabled>Select an option</option>
+            {/* <option value="1" selected>Option 1</option> */}
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+          </select>
+
+          <input type="submit" value="submit" />
+          <P children={text} />
+        </form>
+      );
+    }
+  </script>
+
+  <script src="https://unpkg.com/react-hook-form@7.19.1/dist/index.umd.js"></script>
+
+  <script type="text/babel">
+    // https://react-hook-form.com
+    // ReactHookForm.useForm
+    // register
+    // formState.errors
+
+    function HookForm() {
+      const { handleSubmit, register, formState } = ReactHookForm.useForm({
+        defaultValues: {
+          university: true,
+          // text: 'ferdosi',
+        },
+      });
+      const rendered = React.useRef(0);
+      const onSubmit = data => {
+        console.log(data);
+      };
+
+      return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <label htmlFor="university">click me to check</label>
+          <input
+            id="university"
+            type="checkbox"
+            placeholder="placeholder"
+            {...register('university')}
+          />
+
+          <label>
+            click me to focus textarea
+            <textarea
+              maxLength={4}
+              placeholder="placeholder"
+              {...register('text', {
+                required: false,
+                minLength: { value: 2, message: 'error message' },
+                maxLength: 4,
+              })}
+            />
+            {formState.errors && formState.errors.text && (
+              <p>please enter the text {console.log(formState.errors)}</p>
+            )}
+          </label>
+          <P children={'rendered: ' + rendered.current++} />
+          <label>
+            Email:
+            <input
+              type="email"
+              {...register('email', {
+                required: 'Required',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'invalid email address',
+                },
+              })}
+            />
+            {errors.email && errors.email.message}
+          </label>
+
+          <label>
+            UserName:
+            <input
+              {...register('username', {
+                validate: value => value !== 'admin' || 'Nice try!',
+              })}
+            />
+            {errors.username && errors.username.message}
+          </label>
+
+          <button type="submit">Submit</button>
+          {/* <input type="submit" value="submit" /> */}
+        </form>
+      );
+    }
+  </script>
+
+  <script type="text/babel">
+    function Root() {
+      return [
+        // <FormSubmissionBasic key="FormSubmissionBasic" />,
+        <HookForm key="HookForm" />,
+      ];
+    }
+
+    ReactDOM.render(<Root />, document.getElementById('root'));
+  </script>
+</body>
