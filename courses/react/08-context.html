@@ -1,0 +1,276 @@
+<!--
+🅱️ Steps
+  - think in react
+  - what is context
+  - when to use context
+  - context best practices
+  - custom hook
+  - context default value
+-->
+
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="text/babel">
+    // class App extends React.Component {
+    //   render() {
+    //     // this.state
+    //     // this.props
+    //     // this.context
+    //     return <Toolbar theme="dark" />;
+    //   }
+    // }
+
+    // const App = props => {
+    //   return <Toolbar theme="dark" />;
+    // };
+
+    // function App(props) {
+    //   return <Toolbar theme="dark" />;
+    // }
+  </script>
+
+  <style>
+    .dark {
+      background: black;
+      color: white;
+    }
+    .monikai {
+      background: tomato;
+      color: green;
+    }
+
+    button {
+      border: 2px solid gray;
+    }
+  </style>
+
+  <!-- https://reactjs.org/docs/context.html -->
+  <script type="text/babel">
+    // TODO: default value is optional
+    const ThemeContext = React.createContext('light');
+    // console.log(`👉 ThemeContext`, ThemeContext);
+
+    const P = ({ className, ...props }) => {
+      const themes = React.useContext(ThemeContext);
+      console.log(`👉 <P/> => themes`, themes);
+      return (
+        <p className={className + ` ${themes.theme || themes}`} {...props} />
+      );
+    };
+
+    const A = ({ className, ...props }) => {
+      const themes = React.useContext(ThemeContext);
+      console.log(`👉 <A/> => themes`, themes);
+      return (
+        <a className={className + ` ${themes.theme || themes}`} {...props} />
+      );
+    };
+
+    const Button = ({ ...props }) => {
+      // const themes = React.useContext(ThemeContext);
+      // console.log(`👉 <A/> => themes`, themes);
+      return (
+        <ThemeContext.Consumer>
+          {themes => (
+            <button className={themes.theme || themes}>
+              Button with consumer
+            </button>
+          )}
+        </ThemeContext.Consumer>
+      );
+    };
+
+    // const SOMETHING_NEW = () => null
+
+    // utility class {dark, light}
+    // TODO: css variable
+    // TODO: best practices...
+    // const theme = 'dark'
+    const ThemedApp = () => {
+      const themes = React.useContext(ThemeContext);
+      console.log(`👉 ThemedApp`, themes);
+      return (
+        <div>
+          <ThemeContext.Provider value={'monikai'}>
+            <div>
+              <P theme="text-3xl font-bold underline text-clifford">Hello</P>
+              <A href="netflix.com">
+                <P>Hello</P>
+              </A>
+            </div>
+            <Button />
+          </ThemeContext.Provider>
+          <A href="ishar.ir">Something</A>
+        </div>
+      );
+    };
+
+    const ThemedApp2 = () => {
+      const themes = React.useContext(ThemeContext);
+      console.log(`👉 ThemedApp`, themes);
+      return (
+        <div>
+          <P className="text-3xl font-bold underline text-clifford">Hello</P>
+          <A href="netflix.com">
+            <P>Hello</P>
+          </A>
+          <Button />
+          <button
+            onClick={() =>
+              themes.setTheme(themes.theme === 'dark' ? 'monikai' : 'dark')
+            }
+          >
+            Change theme
+          </button>
+        </div>
+      );
+    };
+
+    const ThemeComponentWithContext = () => {
+      const [theme, setTheme] = React.useState('monikai');
+
+      return (
+        <ThemeContext.Provider value={{ theme, setTheme }}>
+          {<ThemedApp />}
+          <ThemedApp2 />
+        </ThemeContext.Provider>
+      );
+    };
+  </script>
+
+  <script type="text/babel">
+    const CodeBlock = ({ json }) => (
+      <pre children={<code children={JSON.stringify(json, null, 2)} />} />
+    );
+    const authenticationSample = {
+      user: null,
+      login() {
+        this.user = { name: 'atta' };
+        console.log('you are logged in now');
+      },
+      logout() {
+        this.user = null;
+        console.log('you are logged in now');
+      },
+    };
+
+    // 'use strict';
+    // authenticationSample.login()
+    // const loginFn = authenticationSample.login
+    // loginFn() // Error in strict mode
+
+    const AuthenticationContext = React.createContext(null);
+
+    const useAuthenticationContext = () => {
+      const contextValue = React.useContext(AuthenticationContext);
+      // set NODE_ENV
+      // NODE_ENV='development'
+      // .env NODE_ENV=development
+      // if (process.env.NODE_ENV === 'development') {
+      if (contextValue === null)
+        throw new Error(
+          'Please use AuthenticationContext.Provider in your render tree above the current node',
+        );
+      return contextValue;
+    };
+
+    const useUser = () => {
+      const contextValue = useAuthenticationContext();
+      return contextValue.user;
+    };
+
+    const useAuth = () => {
+      const contextValue = useAuthenticationContext();
+      const { login, logout } = contextValue;
+      return [login, logout];
+    };
+
+    const Profile = () => {
+      const user = useUser();
+      return <CodeBlock json={user} />;
+    };
+
+    const SingInSingOut = () => {
+      const [login, logout] = useAuth();
+      return (
+        <div>
+          <button onClick={login}>login</button>
+          {' | '}
+          <button onClick={logout}>logout</button>
+        </div>
+      );
+    };
+
+    const AuthenticationApplication = () => {
+      return (
+        <div>
+          <Profile />
+          <SingInSingOut />
+        </div>
+      );
+    };
+
+    const AuthenticationProvider = () => {
+      const [user, setUser] = React.useState(null);
+
+      const memoized = React.useMemo(
+        () =>
+          Array.from({ length: 10_000 })
+            .fill('')
+            .map(_ => Math.random()),
+        [],
+      );
+
+      // useState(() => () => 5)
+      // setState(() => () => 6)
+
+      React.useMemo(() => () => '...');
+      React.useCallBack(() => '...');
+
+      const login = React.useMemo(
+        () => () => {
+          setUser({ name: 'atta' });
+          console.log('you are logged in now');
+        },
+        [],
+      );
+
+      const logout = React.useCallBack(() => {
+        setUser(null);
+        console.log('you are logged in now');
+      }, []);
+
+      // const value = React.useMemo(() => ({  login, logout }), []);
+      // <AuthenticationContextDispatch.Provider value={value}>
+
+      return (
+        <AuthenticationContext.Provider value={{ user, login, logout }}>
+          <AuthenticationApplication />
+        </AuthenticationContext.Provider>
+      );
+    };
+  </script>
+
+  <script type="text/babel">
+    function Root() {
+      return [
+        // <WhySetStateIsNotSync key="WhySetStateIsNotSync" />,
+        // <BigStateWithUseState key="BigStateWithUseState" />,
+        // <BigStateWithUseReducer key="BigStateWithUseReducer" />,
+        // <ThemedApp key="ThemedApp" />,
+        // <ThemeComponentWithContext key="ThemeComponentWithContext" />,
+        // <ThemeContext key="ThemeContext" />,
+        // <AuthenticationContext key="AuthenticationContext" />,
+        <AuthenticationProvider key="AuthenticationProvider" />,
+      ];
+    }
+
+    ReactDOM.render(<Root />, document.getElementById('root'));
+  </script>
+</body>
