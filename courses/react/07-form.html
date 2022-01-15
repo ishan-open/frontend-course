@@ -186,7 +186,7 @@
                 },
               })}
             />
-            {errors.email && errors.email.message}
+            {formState.errors && 'formState.errors'}
           </label>
 
           <label>
@@ -196,7 +196,7 @@
                 validate: value => value !== 'admin' || 'Nice try!',
               })}
             />
-            {errors.username && errors.username.message}
+            {formState.errors && 'error'}
           </label>
 
           <button type="submit">Submit</button>
