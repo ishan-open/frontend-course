@@ -1,0 +1,60 @@
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+
+  <script type="text/babel">
+    // https://www.bugsnag.com
+    // https://sentry.io
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+      }
+
+      // Update state so the next render will show the fallback UI.
+      static getDerivedStateFromError(error) {
+        return { hasError: true };
+      }
+
+      render() {
+        // if error
+        if (this.state.hasError)
+          return (
+            <img src="https://images.kojaro.com/2018/4/c1f77b05-94e3-469e-8f37-fc23716b8e65.jpg" />
+          );
+
+        return this.props.children;
+      }
+    }
+
+    function ChildComponent() {
+      const [counter, increment] = React.useReducer(s => s + 1, 0);
+      // 5 / 0
+      if (counter === 5) throw new Error('counter must be <= 4');
+      return (
+        <div>
+          <var>{counter}</var>
+          <button onClick={increment} disabled={counter === 4}>
+            increment
+          </button>
+        </div>
+      );
+    }
+
+    function Root() {
+      return (
+        <div className="App">
+          <h1>Error Boundary</h1>
+          <ErrorBoundary>
+            <ChildComponent />
+          </ErrorBoundary>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<Root />, document.getElementById('root'));
+  </script>
+</body>
