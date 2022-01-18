@@ -1,0 +1,89 @@
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+
+  <!-- https://stackblitz.com/edit/react-ts-xmqsdw?file=Hello.tsx -->
+  <style>
+    input {
+      display: block;
+    }
+    input.active {
+      border: 10px solid coral;
+    }
+  </style>
+
+  <script type="text/babel">
+    const Button = ({ onClick, text }) => (
+      <button onClick={onClick} children={text} />
+    );
+
+    const Input = ({ asghar, ref }) => {
+      console.log('from input', asghar, ref);
+      return <input id="inp" placeholder="outside" ref={asghar} />;
+    };
+
+    const ForwardedRefInput = React.forwardRef(function ForwardedRefInput(
+      props,
+      ref,
+    ) {
+      console.log(`👉 ref`, ref);
+      return (
+        <input id="finp" placeholder="forwarded ref component" ref={ref} />
+      );
+    });
+
+    const ForwardedRefButton = React.forwardRef(({ onClick, text }, ref) => (
+      <button
+        onClick={() => ref.current.classList.toggle('active')}
+        children={text}
+      />
+    ));
+
+    function Root() {
+      // const create = React.createRef(null);
+      const refInside = React.useRef(null); // {current: null}
+      const refOutside = React.useRef(null);
+      const refForwardRef = React.useRef(null);
+      const tempRef = React.useRef(5);
+
+      const [_, forceRender] = React.useReducer(s => s + 1, 0);
+
+      // refForwardRef.current = 2;
+
+      return (
+        <div>
+          <Input asghar={refOutside} ref={tempRef} />
+          <input placeholder="inside" ref={refInside} />
+          {/* real time communication */}
+          <ForwardedRefInput ref={refForwardRef} />
+          <ForwardedRefButton
+            text="select ForwardedRefInput"
+            ref={refForwardRef}
+          />
+
+          <Button
+            text="select input"
+            onClick={() => {
+              // document.getElementById('inp').classList.toggle('active');
+              refInside.current.classList.toggle('active');
+              console.log(`👉 refOutside`, refOutside);
+              refOutside.current.classList.toggle('active');
+              refForwardRef.current.classList.toggle('active');
+            }}
+          />
+          <button onClick={forceRender}>Force render</button>
+        </div>
+      );
+    }
+
+    ReactDOM.render(
+      <React.StrictMode>
+        <Root />
+      </React.StrictMode>,
+      document.getElementById('root'),
+    );
+  </script>
+</body>
