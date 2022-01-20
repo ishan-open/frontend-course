@@ -35,51 +35,60 @@
     // https://sentry.io
     // https://www.npmjs.com/package/react-error-boundary
 
-    // immer
-    // useSt8
-    // const [text, setText] = React.useState('')
-    // const [age, setAge] = React.useState(0)
-    // const [price, setPrice] = React.useState(1000)
-    // React.useEffect(() => {}, [price])
-    // React.useEffect(() => {}, [age])
-    // React.useEffect(() => {}, [age, name])
+    const ErrorBoundaryContext = React.createContext();
+
+    const useErrorHandling = () => {
+      const contextValue = React.useContext(ErrorBoundaryContext);
+      if (!contextValue) throw new Error('Provider!!!');
+      return contextValue;
+    };
+
+    const ErrorSupplier = ({ children, FallBack }) => {
+      const [hasError, setHasError] = React.useState(false);
+
+      const value = React.useMemo(
+        () => ({
+          triggerError: () => setHasError(true),
+          reset: setHasError.bind(null, false),
+        }),
+        [],
+      );
+
+      return (
+        <ErrorBoundaryContext.Provider value={value}>
+          {hasError ? <FallBack /> : children}
+        </ErrorBoundaryContext.Provider>
+      );
+    };
+
+    const RefreshButton = () => (
+      <button className="icon-refresh" onClick={() => window.location.reload()}>
+        refresh fallback
+      </button>
+    );
 
     class ErrorBoundary extends React.Component {
-      constructor(props) {
-        super(props);
-        this.state = { hasError: false };
-      }
-
+      // constructor(props) {
+      //   super(props);
+      //   this.state = { hasError: false };
+      // }
+      state = { hasError: false };
       // Update state so the next render will show the fallback UI.
       static getDerivedStateFromError(error) {
         console.log(`👉 error`, error);
         console.dir(error.message);
-        // this.setState({hasError: true})
-        return { hasError: true };
-      }
 
-      componentDidCatch(error, info) {
-        // Example "componentStack":
-        //   in ComponentThatThrows (created by App)
-        //   in ErrorBoundary (created by App)
-        //   in div (created by App)
-        //   in App
-        logComponentStackToMyService(info.componentStack);
+        return { hasError: true, error };
       }
 
       render() {
-        // throw new Error('inside error boundary');
         // if error
         if (this.state.hasError)
+          // return <this.props.fallback error={this.state.error}/> ||(
           return (
             <div>
               <img src="https://images.kojaro.com/2018/4/c1f77b05-94e3-469e-8f37-fc23716b8e65.jpg" />
-              <button
-                className="icon-refresh"
-                onClick={() => window.location.reload()}
-              >
-                refresh
-              </button>
+              <RefreshButton />
             </div>
           );
 
@@ -90,37 +99,45 @@
     function ChildComponent() {
       const [counter, increment] = React.useReducer(s => s + 1, 0);
       React.useEffect(() => {
-        if (counter === 1) throw new Error('No, it can not be 4 either');
+        // if (counter === 0) throw new Error('No, it can not be 4 either');
       }, [counter]);
 
       // 5 / 0
-      React.useEffect(() => {
-        // [] 503 server
-        // delay server
-        // setTimeout(() => {
-        //   alert('inside setTimeout');
-        //   throw new Error('Inside setTimeout');
-        // }, 500);
-        // Promise.reject(5);
-      }, []);
 
       if (counter === 5) throw new Error('counter must be <= 4');
-
       return (
         <div>
-          {(undefined || []).map(i => i)}
-
-          <var>{counter}</var>
-          <button
+          <var
             onClick={() => {
-              throw new Error('On Click error');
+              throw new Error('chert');
             }}
           >
-            face error
-          </button>
+            {counter}
+          </var>
           <button onClick={increment} disabled={counter === 4}>
             increment
           </button>
+        </div>
+      );
+    }
+
+    function ComponentWithCatchError() {
+      const errorHandling = useErrorHandling();
+      const click = () => {
+        try {
+          throw new Error('chert');
+        } catch (o_O) {
+          console.log(`👉 o_O`, o_O);
+          errorHandling.triggerError();
+        }
+      };
+      return (
+        <div>
+          <h1>ChildComponent</h1>
+          <button onClick={click}>
+            Click me to face error in chile component with catch
+          </button>
+          <img src="https://courses.w3schools.com/" onError={click} />
         </div>
       );
     }
@@ -132,6 +149,9 @@
           <ErrorBoundary>
             <ChildComponent />
           </ErrorBoundary>
+          <ErrorSupplier FallBack={RefreshButton}>
+            <ComponentWithCatchError />
+          </ErrorSupplier>
         </div>
       );
     }
