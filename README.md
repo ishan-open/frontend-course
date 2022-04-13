@@ -35,7 +35,7 @@
 
 <p align="center">
 <a href="https://twitter.com/realamirhe"><img width="30px" src="https://simpleicons.org/icons/twitter.svg" alt="GitLab"><a><span>&nbsp;</span><span>&nbsp;</span>
-<a href="https://github.com/amirHossein-Ebrahimi"><img width="30px" src="https://simpleicons.org/icons/github.svg" alt="GitHub"><a><span>&nbsp;</span><span>&nbsp;</span>
+<a href="https://github.com/realamirhe"><img width="30px" src="https://simpleicons.org/icons/github.svg" alt="GitHub"><a><span>&nbsp;</span><span>&nbsp;</span>
 <a href="https://www.linkedin.com/in/amirhossein-ebrahimi-014164225/"><img width="30px" src="https://simpleicons.org/icons/linkedin.svg" alt="LinkedIn"><a><span>&nbsp;</span><span>&nbsp;</span>
 </p>
                                                                                                                          
